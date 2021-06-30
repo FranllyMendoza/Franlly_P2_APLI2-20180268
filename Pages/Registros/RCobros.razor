@@ -71,12 +71,12 @@
                         @foreach (var item in Cobro.Detalle)
                         {
                             <tr>
-                                <td>@item.VentaId</td>
+                                <td>@item.Venta.VentaId</td>
                                 <td>@item.Venta.Fecha</td>
                                 <td>@item.Venta.Monto</td>
                                 <td>@item.Venta.Balance</td>
                                 <td>@item.Cobrado</td>
-                                <th><input type="checkbox" /></th>
+                                <th><input type="checkbox" @onchange="@(() => Cobrar(item))" /></th>
 
                             </tr>
                         }
@@ -140,29 +140,86 @@
     public int CobroId { get; set; }
     Cobros Cobro = new Cobros();
     List<Clientes> ListaClientes = new List<Clientes>();
-
+    
     protected override void OnInitialized()
     {
         Nuevo();
-        ListaClientes = ClientesBLL.GetList(e => true);
-
 
     }
 
     public void Nuevo()
     {
         Cobro = new Cobros();
+        ListaClientes = ClientesBLL.GetList(e => true);
+       
     }
     public void Eliminar()
     {
+        bool Eliminado;
+
+        Eliminado = CobrosBLL.Eliminar(Cobro.CobroId);
+
+        if (Eliminado)
+        {
+            Nuevo();
+            Toast.ShowSuccess("Orden eliminidad correctamente");
+
+        }
+        else
+            Toast.ShowError("no fue posible eliminar esta orden");
 
     }
     public void Buscar()
     {
+        if (Cobro.CobroId > 0)
+        {
+            var cobro = CobrosBLL.Buscar(CobroId);
+            if (cobro != null)
+            {
+                this.Cobro = cobro;
+            }
+            else
+            {
+                Toast.ShowError("cobro no encontrado");
+            }
+        }
+        else
+            Toast.ShowWarning("Debe de ingresar un id para buscar");
+
 
     }
     public void Guardar()
     {
+        bool guardado;
+        if (Cobro.CobroId == 0)
+        {
+            Cobro.Detalle.RemoveAll(d => d.Cobrado == 0);
+            guardado = CobrosBLL.Guardar(Cobro);
 
+            if (guardado)
+            {
+                Toast.ShowSuccess("se Guardo correctamente");
+                Nuevo();
+            }
+            else
+                Toast.ShowError("no se guardo correctamente");
+
+        }
+        else
+            Toast.ShowWarning("no se puede modificar el cobro");
+    }
+
+    private void Cobrar(CobrosDetalle cobrosDetalle)
+    {
+        if (cobrosDetalle.Cobrado == 0)
+        {
+            cobrosDetalle.Cobrado = cobrosDetalle.Venta.Balance;
+            Cobro.TotalCobro += cobrosDetalle.Cobrado;
+        }
+        else
+        {
+            cobrosDetalle.Cobrado = 0;
+            Cobro.TotalCobro -= cobrosDetalle.Venta.Balance;
+        }
     }
 }
