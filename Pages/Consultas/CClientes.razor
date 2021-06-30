@@ -1,0 +1,129 @@
+﻿@page "/CClientes"
+
+@using Franlly_P2_APLI2.BLL;
+@using Franlly_P2_APLI2.Models;
+@using Blazored.Toast;
+@using Blazored.Toast.Services;
+
+@inject IToastService toast
+@inject NavigationManager Nav
+@inject IJSRuntime Confirmacion
+
+
+<div class="card">
+    <div class="card-header">
+        <h1>Consulta de clientes</h1>
+    </div>
+
+    <div class="card-body">
+
+        <div class="form-row mb-2 mt-2">
+            <label style="font-size: 22px">&nbsp;Filtrar por:</label>
+            <label style="font-size: 22px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Criterio:</label>
+        </div>
+        <div class="form-row mb-3 mt-3">
+
+            <div class="col-sm-2">
+                <select @bind="Index" class="custom-select">
+                    <option value="-1" disabled>Seleccionar opción</option>
+                    <option value="0">Todo</option>
+                    <option value="1">Cliente Id</option>
+                    <option value="2">Nombre</option>
+                </select>
+            </div>
+
+            @*Criterio*@
+            <div class="col-sm-8">
+                <input class="form-control w-100" type="@(Index == 1 ? "number" : "text")" @bind-value="Criterio" placeholder="Ingrese el criterio a filtrar para obtener el o los clientes" />
+            </div>
+
+            @*Filtrar*@
+            <div class="col-sm-2">
+                <button class="btn btn-primary" @onclick="Buscar"><i class="oi oi-magnifying-glass" /> Filtrar</button>
+            </div>
+        </div>
+
+        @if (ListaClientes == null)
+        {
+            <div class="form-group">
+                <h2>No Posee datos... Agrega Clientes.</h2>
+            </div>
+        }
+        else
+        {
+            @*Consulta*@
+            <div class="form-group">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Cliente Id</th>
+                            <th>Nombre</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cont in ListaClientes)
+                        {
+                            <tr>
+                                <td>@cont.ClienteId</td>
+                                <td>@cont.Nombres</td>
+                                
+                                <td>
+                                    <button class="btn btn-info" >
+                                        <i class="oi oi-pencil" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn  btn-danger">
+                                        <i class="oi oi-trash" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                           
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        }
+    </div>
+   
+</div>
+
+@code {
+    public int Index = -1;
+    public string Criterio = string.Empty;
+    List<Clientes> ListaClientes = new List<Clientes>();
+
+    protected override void OnInitialized()
+    {
+        Actualizar();
+    }
+    public void Actualizar()
+    {
+        ListaClientes = ClientesBLL.GetList(e => true);
+    }
+
+    void Buscar()
+    {
+        if (Index == 0)
+        {
+            ListaClientes = ClientesBLL.GetList(p => true).ToList();
+        }
+
+
+        else if (Index == 1)
+        {
+            if (int.TryParse(Criterio, out int ClienteId))
+            {
+                ListaClientes = ClientesBLL.GetList(p => p.ClienteId == ClienteId).ToList();
+            }
+        }
+
+        else if (Index == 2)
+        {
+            ListaClientes = ClientesBLL.GetList(p => p.Nombres.ToLower().Contains(Criterio.ToLower())).ToList();
+        }
+
+    }
+
+
+}
