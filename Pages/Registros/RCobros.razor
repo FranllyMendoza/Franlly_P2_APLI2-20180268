@@ -174,7 +174,7 @@
     {
         if (Cobro.CobroId > 0)
         {
-            var cobro = CobrosBLL.Buscar(CobroId);
+            var cobro = CobrosBLL.Buscar(Cobro.CobroId);
             if (cobro != null)
             {
                 this.Cobro = cobro;
@@ -182,11 +182,13 @@
             else
             {
                 Toast.ShowError("cobro no encontrado");
+                Nuevo();
             }
         }
         else
             Toast.ShowWarning("Debe de ingresar un id para buscar");
 
+       
 
     }
     public void Guardar()

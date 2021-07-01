@@ -104,10 +104,11 @@ namespace Franlly_P2_APLI2.BLL
 
             try
             {
-                var cobros = contexto.Cobros.Find(id);
-                if (cobros != null)
+                var eliminado = contexto.Cobros.Find(id);
+
+                if (eliminado != null)
                 {
-                    contexto.Entry(cobros).State = EntityState.Deleted;
+                    contexto.Entry(eliminado).State = EntityState.Deleted;
                     paso = contexto.SaveChanges() > 0;
                 }
             }
@@ -122,6 +123,7 @@ namespace Franlly_P2_APLI2.BLL
 
             return paso;
         }
+
 
         public static Cobros Buscar(int id)
         {
