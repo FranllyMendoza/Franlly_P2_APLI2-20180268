@@ -6,7 +6,8 @@
 @using Blazored.Toast.Services;
 
 @inject IToastService toast
-
+@inject NavigationManager Nav
+@inject IJSRuntime Confirmacion
 <div class="card accordion">
     <div class="card-header">
         <h1>Consulta de Cobros</h1>
@@ -76,9 +77,8 @@
                                 <td>@cont.TotalCobro</td>
                                 <td>@cont.Observaciones</td>
                                 <td>
-
-                                    <button class="btn  btn-danger" @onclick="() => Eliminar(cont.CobroId)">
-                                        <i class="oi oi-trash" aria-hidden="true"></i>
+                                    <button class="btn btn-info" @onclick="() => Editar(cont.CobroId)">
+                                        <i class="oi oi-pencil" aria-hidden="true"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -94,7 +94,7 @@
         <div class="form-group text-left">
             <label>Balance total: @TotalCobrado</label>
         </div>
-        
+
     </div>
 </div>
 
@@ -132,13 +132,17 @@
 
     }
 
+    public void Editar(int Id)
+    {
+        Nav.NavigateTo($"/Cobros/{Id}");
+    }
 
     private void Eliminar(int id)
     {
         bool Paso;
 
 
-        Paso = VentasBLL.Eliminar(id);
+        Paso = CobrosBLL.Eliminar(id);
 
         if (Paso)
         {

@@ -69,10 +69,7 @@
                                 <td>@cont.Nombres</td>
                                 
                                 <td>
-                                    <button class="btn btn-info" >
-                                        <i class="oi oi-pencil" aria-hidden="true"></i>
-                                    </button>
-                                    <button class="btn  btn-danger">
+                                    <button class="btn  btn-danger" @onclick="() =>Eliminar(cont.ClienteId)">
                                         <i class="oi oi-trash" aria-hidden="true"></i>
                                     </button>
                                 </td>
@@ -124,6 +121,20 @@
         }
 
     }
+    void Eliminar(int id)
+    {
+        bool Paso;
 
 
+        Paso = ClientesBLL.Eliminar(id);
+
+        if (Paso)
+        {
+            Actualizar();
+            toast.ShowSuccess("Transacción exitosa!");
+        }
+        else
+            toast.ShowError("No fue posible Eliminar esta venta.");
+        return;
+    }
 }
