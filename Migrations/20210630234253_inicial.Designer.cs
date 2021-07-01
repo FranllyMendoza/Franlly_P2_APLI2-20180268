@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Franlly_P2_APLI2.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20210629023246_inicial")]
+    [Migration("20210630234253_inicial")]
     partial class inicial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

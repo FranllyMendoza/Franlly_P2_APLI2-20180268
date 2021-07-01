@@ -43,15 +43,15 @@
             @*Cliente*@
             <div class="form-group">
                 <label>Cliente</label>
-                <InputSelect @bind-Value="Cobro.ClienteId" class="form-control">
-                    <option value="0" disabled selected>Seleccionar cliente</option>
+                <InputSelect @bind-Value="Cobro.ClienteId" class="form-control" @onclick="CobrosPendientes">
+                    <option value="0" disabled selected>Seleccionar Cliente</option>
                     @foreach (var item in ListaClientes)
                     {
                         <option value="@item.ClienteId">@item.Nombres</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="(() => Cobro.ClienteId)" />
-            </div>
+                    <ValidationMessage For="(() => Cobro.ClienteId)" />
+</div>
             <div class="card-header ">
                 <h3>Cobros Detalle</h3>
             </div>
@@ -71,7 +71,7 @@
                         @foreach (var item in Cobro.Detalle)
                         {
                             <tr>
-                                <td>@item.Venta.VentaId</td>
+                                <td>@item.VentaId</td>
                                 <td>@item.Venta.Fecha</td>
                                 <td>@item.Venta.Monto</td>
                                 <td>@item.Venta.Balance</td>
@@ -140,7 +140,7 @@
     public int CobroId { get; set; }
     Cobros Cobro = new Cobros();
     List<Clientes> ListaClientes = new List<Clientes>();
-    
+
     protected override void OnInitialized()
     {
         Nuevo();
@@ -151,7 +151,7 @@
     {
         Cobro = new Cobros();
         ListaClientes = ClientesBLL.GetList(e => true);
-       
+
     }
     public void Eliminar()
     {
@@ -221,5 +221,12 @@
             cobrosDetalle.Cobrado = 0;
             Cobro.TotalCobro -= cobrosDetalle.Venta.Balance;
         }
+    }
+    public void CobrosPendientes()
+    {
+        if (Cobro.ClienteId == 0)
+            return;
+
+        Cobro.Detalle = VentasBLL.ObetenerVentasPendientes(Cobro.ClienteId);
     }
 }
