@@ -37,5 +37,7 @@ namespace Franlly_P2_APLI2.Models
             Detalle = new List<CobrosDetalle>();
         }
 
+       
+
     }
 }

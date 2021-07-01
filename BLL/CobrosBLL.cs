@@ -104,12 +104,24 @@ namespace Franlly_P2_APLI2.BLL
 
             try
             {
-                var eliminado = contexto.Cobros.Find(id);
-
-                if (eliminado != null)
+                var cobros = Buscar(id);
+                if (cobros != null)
                 {
-                    contexto.Entry(eliminado).State = EntityState.Deleted;
+                    contexto.Cobros.Remove(cobros);
                     paso = contexto.SaveChanges() > 0;
+
+                    if (paso)
+                    {
+                        foreach (var cobroDetalle in cobros.Detalle)
+                        {
+                            var venta = VentasBLL.Buscar(cobroDetalle.VentaId);
+                            if (venta != null)
+                            {
+                                venta.Balance += cobroDetalle.Cobrado;
+                                VentasBLL.Guardar(venta);
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception)
