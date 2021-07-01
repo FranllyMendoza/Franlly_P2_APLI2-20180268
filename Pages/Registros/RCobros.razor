@@ -138,6 +138,7 @@
 @code {
     [Parameter]
     public int CobroId { get; set; }
+    int Seleccionado = 0;
     Cobros Cobro = new Cobros();
     List<Clientes> ListaClientes = new List<Clientes>();
 
@@ -215,11 +216,13 @@
         {
             cobrosDetalle.Cobrado = cobrosDetalle.Venta.Balance;
             Cobro.TotalCobro += cobrosDetalle.Cobrado;
+            Cobro.Totales++;
         }
         else
         {
             cobrosDetalle.Cobrado = 0;
             Cobro.TotalCobro -= cobrosDetalle.Venta.Balance;
+            Cobro.Totales--;
         }
     }
     public void CobrosPendientes()

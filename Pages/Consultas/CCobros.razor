@@ -1,0 +1,152 @@
+﻿@page "/CCobros"
+
+@using Franlly_P2_APLI2.BLL;
+@using Franlly_P2_APLI2.Models;
+@using Blazored.Toast;
+@using Blazored.Toast.Services;
+
+@inject IToastService toast
+
+<div class="card accordion">
+    <div class="card-header">
+        <h1>Consulta de Cobros</h1>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col form-group">
+                <label>Filtrar por:</label>
+                <select @bind="Index" class="custom-select">
+                    <option value="-1" disabled>Seleccionar opción</option>
+                    <option value="0">Todo</option>
+                    <option value="1">Cobro Id</option>
+                    <option value="2">Cliente Id</option>
+                </select>
+            </div>
+
+
+            <div class="col form-group">
+                <label>Criterio:</label>
+                <div class="input-group">
+                    <input class="form-control" type="@(Index == 1 || Index == 2 ? "number" : "text")" @bind-value="Criterio" placeholder="Ingrese el criterio a filtrar para obtener la venta deseada" />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" @onclick="Buscar">
+                            <i class="oi oi-magnifying-glass" />
+                            Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @if (ListaCobros == null)
+        {
+            <div class="form-group">
+                <h2>No Posee datos... Agrega Cobros.</h2>
+            </div>
+        }
+        else
+        {
+            //consultas
+            <div class="form-group">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Cobro Id</th>
+                            <th>Fecha</th>
+                            <th>Cliente Id</th>
+                            <th>Totales</th>
+                            <th>Total Cobrado</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!string.IsNullOrEmpty(TotalCobrado.ToString()))
+                            TotalCobrado = 0;
+
+                        @foreach (var cont in ListaCobros)
+                        {
+                            <tr>
+                                <td>@cont.CobroId</td>
+                                <td>@cont.Fecha</td>
+                                <td>@cont.ClienteId</td>
+                                <td>@cont.Totales</td>
+                                <td>@cont.TotalCobro</td>
+                                <td>@cont.Observaciones</td>
+                                <td>
+                                    <button class="btn  btn-danger" @onclick="() => Eliminar(cont.CobroId)">
+                                        <i class="oi oi-trash" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            TotalCobrado += cont.TotalCobro;
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        }
+    </div>
+    <div class="card-footer">
+        <div class="form-group text-left">
+            <label>Balance total: @TotalCobrado</label>
+        </div>
+        <h6 style="text-align:right">Hecho por Anneury Sosa...</h6>
+    </div>
+</div>
+
+@code {
+    public int Index = -1;
+    public double TotalCobrado;
+    public string Criterio;
+    List<Cobros> ListaCobros = new List<Cobros>();
+
+    protected override void OnInitialized()
+    {
+        Actualizar();
+    }
+    public void Actualizar()
+    {
+        ListaCobros = CobrosBLL.GetList(e => true);
+    }
+
+    void Buscar()
+    {
+        if (Index == 0)
+        {
+            ListaCobros = CobrosBLL.GetList(p => true).ToList();
+        }
+        else if (Index == 1)
+        {
+
+            ListaCobros = CobrosBLL.GetList(p => p.CobroId == int.Parse(Criterio)).ToList();
+
+        }
+        else if (Index == 2)
+        {
+            ListaCobros = CobrosBLL.GetList(p => p.ClienteId == int.Parse(Criterio)).ToList();
+        }
+
+    }
+
+
+    private void Eliminar(int id)
+    {
+        bool Paso;
+
+
+        Paso = VentasBLL.Eliminar(id);
+
+        if (Paso)
+        {
+            Actualizar();
+            toast.ShowSuccess("Transacción exitosa!");
+        }
+        else
+            toast.ShowError("No fue posible Eliminar esta venta.");
+        return;
+    }
+
+}
